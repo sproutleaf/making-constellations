@@ -17,32 +17,25 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    background: linear-gradient(to bottom, #87ceeb, #d3d3d3);
+    background: linear-gradient(to bottom, #87ceeb, white);
 }
 
-#first {
-    position: absolute;
-    left: 700px;
-    top: 450px;
+#earth {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 50vh;
 }
 
-#second {
+#poem {
     position: absolute;
-    left: 800px;
-    top: 500px;
-}
-
-#third {
-    position: absolute;
-    left: 900px;
-    top: 420px;
-}
-
-#sentence {
-    position: absolute;
-    left: 300px;
-    top: 300px;
     color: whitesmoke;
+    left: 10vw;
+    top: 20vh;
+}
+
+.words {
+    position: absolute;
 }
 
 .star {
@@ -55,8 +48,4 @@ body {
     position: absolute;
     border-bottom: 1px dashed whitesmoke;
     transform-origin: 0 0;
-}
-
-#first:hover {
-    cursor: crosshair;
 }
