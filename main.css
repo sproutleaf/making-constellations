@@ -1,0 +1,62 @@
+@font-face {
+    font-family: 'rag';
+    src: url('assets/Rag-Regular.woff2');
+}
+
+html,
+body {
+    font-family: 'rag';
+}
+
+.mirrored-cursor {
+    width: 18px;
+    height: 18px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: linear-gradient(to bottom, #87ceeb, #d3d3d3);
+}
+
+#first {
+    position: absolute;
+    left: 700px;
+    top: 450px;
+}
+
+#second {
+    position: absolute;
+    left: 800px;
+    top: 500px;
+}
+
+#third {
+    position: absolute;
+    left: 900px;
+    top: 420px;
+}
+
+#sentence {
+    position: absolute;
+    left: 300px;
+    top: 300px;
+    color: whitesmoke;
+}
+
+.star {
+    position: absolute;
+    font-size: 14px;
+    color: whitesmoke;
+}
+
+.line {
+    position: absolute;
+    border-bottom: 1px dashed whitesmoke;
+    transform-origin: 0 0;
+}
+
+#first:hover {
+    cursor: crosshair;
+}
