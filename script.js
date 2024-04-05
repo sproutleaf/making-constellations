@@ -18,6 +18,20 @@ let p9 = ['across our faces'];
 let ps = [p1, p2, p3, p4, p5, p6, p7, p8, p9];
 let i = 0;
 
+function randomXCoordinate(w) {
+    const min = Math.ceil(0.1 * w);
+    const max = Math.floor(0.9 * w);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomYCoordinate(h) {
+    const min = 1;
+    const max = Math.floor(0.9 * h);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 $(document).ready(function () {
     if (window.matchMedia("(min-width: 768px)").matches) {
         $(document).mousemove(function (event) {
@@ -36,20 +50,51 @@ $(document).ready(function () {
             });
         });
 
+        function checkDivCollision(div, existingDivs) {
+            for (let d of existingDivs) {
+                if (div.top + div.height > d.top &&
+                    div.top < d.top + d.height &&
+                    div.left + div.width > d.left &&
+                    div.left < d.left + d.width) return true;
+            }
+            return false;
+        }
+
         // Putting poem fragments onto the page
         function putWords() {
             let fragments = ps[i];
+
+            // Dummy container used for detecting div collision
+            const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>');
+            $('body').append(container);
+
             fragments.forEach(f => {
                 const fDiv = $('<div class="words"></div>').text(f).hide();
+                container.append(fDiv);
+
                 let earth = $('#earth');
 
-                const x = Math.floor(Math.random() * (earth.width() - 100));
-                const y = Math.floor(Math.random() * (earth.height() - 20));
+                let collision = true;
+                let x, y;
+
+                while (collision) {
+                    x = randomXCoordinate(earth.width());
+                    y = randomYCoordinate(earth.height());
+
+                    collision = checkDivCollision({
+                        left: x,
+                        top: y,
+                        width: fDiv.width(),
+                        height: fDiv.height()
+                    }, $('.words'));
+                }
                 fDiv.css({ left: x, top: y });
 
                 earth.append(fDiv);
                 fDiv.fadeIn(2000);
             });
+
+            container.remove();
         }
         putWords();
 
