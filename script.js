@@ -5,17 +5,18 @@ let cursor = { x: -1, y: -1 };
 let os = 10;
 
 // Fragments of the poems
-let p1 = ['as i', 'as we', 'as they'];
-let p2 = ['embrace', 'resist', 'contemplate', 'speculate', 'tempt'];
-let p3 = ['the future', 'the present', 'the past'];
-let p4 = ['we work', 'i struggle', 'we begin', 'they fail', 'the nature dances'];
-let p5 = ['to understand', 'to find', 'to unbraid', 'to accept', 'to question'];
-let p6 = ['the grief', 'the grief', 'the joy', 'the optimism'];
+let p1 = ['as i', 'as you', 'as we', 'as they', 'if i', 'if you', 'if we', 'if they'];
+let p2 = ['embrace', 'resist', 'contemplate', 'speculate', 'tempt', 'admire', 'desire', 'imagine', 'grasp', 'release', 'ruin', 'celebrate', 'sense', 'recognize', 'find', 'share', 'seek', 'notice', 'confess', 'swallow', 'promise'];
+let p3 = ['the future', 'the present', 'the past', 'the secret', 'the path', 'the affirmation', 'the hope', 'the joy', 'the faith', 'the poetics', 'the suffering'];
+let p4 = ['we work', 'i struggle', 'we begin', 'they fail', 'the nature dances', 'we allude', 'i mimic', 'they taunt'];
+let p5 = ['to understand', 'to find', 'to unbraid', 'to accept', 'to question', 'to comprehend'];
+let p6 = ['the grief', 'the joy', 'the optimism'];
 let p7 = ['we shift', 'we wield', 'we bury'];
 let p8 = ['into light', 'as ash'];
 let p9 = ['across our faces'];
 
 let ps = [p1, p2, p3, p4, p5, p6, p7, p8, p9];
+let lengths = [3, 4, 5, 3, 4, 3, 3, 2, 1];
 let i = 0;
 
 let timesOfDay;
@@ -84,7 +85,6 @@ function getTimesFromLocation(location) {
         .then(data => {
             console.log(data);
             timesOfDay = data.results;
-            console.log(timesOfDay);
         })
         .catch(error => console.error('Error:', error));
 }
@@ -116,9 +116,57 @@ function getCurrentPosition() {
     });
 }
 
+// Putting poem fragments onto the page
+function putWords() {
+    let fragments = ps[i];
+
+    // Dummy container used for detecting div collision
+    const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>');
+    $('body').append(container);
+
+    fragments.forEach(f => {
+        const fDiv = $('<div class="words"></div>').text(f).hide();
+        container.append(fDiv);
+
+        let earth = $('#earth');
+
+        let collision = true;
+        let x, y;
+
+        while (collision) {
+            x = randomXCoordinate(earth.width());
+            y = randomYCoordinate(earth.height());
+
+            collision = checkDivCollision({
+                left: x,
+                top: y,
+                width: fDiv.width(),
+                height: fDiv.height()
+            }, $('.words'));
+        }
+
+        console.log(fDiv.width(), fDiv.height());
+        fDiv.css({ left: x, top: y });
+
+        earth.append(fDiv);
+        fDiv.fadeIn(2000);
+    });
+
+    container.remove();
+}
+
+function enter() {
+    $("#intro").fadeOut(5000, function () {
+        putWords();
+    });
+
+    $(document).off('click', enter);
+}
+$(document).on('click', enter);
+
 $(document).ready(function () {
     if (window.matchMedia("(min-width: 768px)").matches) {
-        getLocalTime();
+        // getLocalTime();
         getLocationAndTimes();
 
         $(document).mousemove(function (event) {
@@ -137,45 +185,8 @@ $(document).ready(function () {
             });
         });
 
-        // Putting poem fragments onto the page
-        function putWords() {
-            let fragments = ps[i];
 
-            // Dummy container used for detecting div collision
-            const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>');
-            $('body').append(container);
-
-            fragments.forEach(f => {
-                const fDiv = $('<div class="words"></div>').text(f).hide();
-                container.append(fDiv);
-
-                let earth = $('#earth');
-
-                let collision = true;
-                let x, y;
-
-                while (collision) {
-                    x = randomXCoordinate(earth.width());
-                    y = randomYCoordinate(earth.height());
-
-                    collision = checkDivCollision({
-                        left: x,
-                        top: y,
-                        width: fDiv.width(),
-                        height: fDiv.height()
-                    }, $('.words'));
-                }
-                fDiv.css({ left: x, top: y });
-
-                earth.append(fDiv);
-                fDiv.fadeIn(2000);
-            });
-
-            container.remove();
-        }
-        putWords();
-
-        var prevStarCoords = null;
+        let prevStarCoords = null;
         $(document).on('click', '.words', function (event) {
             if (i >= ps.length) return;
             // Add fragments to poems
@@ -220,5 +231,6 @@ $(document).ready(function () {
             });
             putWords();
         });
+
     }
 });
