@@ -18,6 +18,8 @@ let p9 = ['across our faces'];
 let ps = [p1, p2, p3, p4, p5, p6, p7, p8, p9];
 let i = 0;
 
+let timesOfDay;
+
 function randomXCoordinate(w) {
     const min = Math.ceil(0.1 * w);
     const max = Math.floor(0.9 * w);
@@ -30,6 +32,16 @@ function randomYCoordinate(h) {
     const max = Math.floor(0.9 * h);
 
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function checkDivCollision(div, existingDivs) {
+    for (let d of existingDivs) {
+        if (div.top + div.height > d.top &&
+            div.top < d.top + d.height &&
+            div.left + div.width > d.left &&
+            div.left < d.left + d.width) return true;
+    }
+    return false;
 }
 
 function getLocalTime() {
@@ -48,41 +60,67 @@ function getLocalTime() {
     document.getElementById('local-time').innerHTML = 'Your local time is: ' + timeString;
 }
 
-function getUserLocation() {
+function getLocationAndTimes() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(getTimesFromLocation, showError);
     } else {
-        alert("Geolocation is not supported by this browser!");
+        document.getElementById('location').innerHTML = 'Geolocation is not supported by this browser.';
     }
 }
 
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const long = position.coords.longitude;
+function getTimesFromLocation(location) {
+    var lat = location.coords.latitude;
+    var long = location.coords.longitude;
 
-    alert("Latitude: " + lat + "\nLongitude: " + long);
+    console.log("Coordinates: ", lat, long);
+
+    // Using https://sunrisesunset.io/api/ to fetch the specific times of day;
+    // the time data is used to generate different background effects and
+    // experiences.
+    const url = `https://api.sunrisesunset.io/json?lat=${lat}&lng=${long}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            timesOfDay = data.results;
+            console.log(timesOfDay);
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
-            alert("User denied the request for Geolocation.");
+            document.getElementById('location').innerHTML = 'User denied the request for Geolocation.';
             break;
         case error.POSITION_UNAVAILABLE:
-            alert("Location information is unavailable.");
+            document.getElementById('location').innerHTML = 'Location information is unavailable.';
             break;
         case error.TIMEOUT:
-            alert("The request to get user location timed out.");
+            document.getElementById('location').innerHTML = 'The request to get user location timed out.';
             break;
         case error.UNKNOWN_ERROR:
-            alert("An unknown error occurred.");
+            document.getElementById('location').innerHTML = 'An unknown error occurred.';
             break;
     }
+}
+
+function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+        } else {
+            reject("Geolocation is not supported by this browser.");
+        }
+    });
 }
 
 $(document).ready(function () {
     if (window.matchMedia("(min-width: 768px)").matches) {
         getLocalTime();
+        getLocationAndTimes();
+
         $(document).mousemove(function (event) {
             let width = $(window).innerWidth();
             let height = $(window).innerHeight();
@@ -98,16 +136,6 @@ $(document).ready(function () {
                 'display': 'block'
             });
         });
-
-        function checkDivCollision(div, existingDivs) {
-            for (let d of existingDivs) {
-                if (div.top + div.height > d.top &&
-                    div.top < d.top + d.height &&
-                    div.left + div.width > d.left &&
-                    div.left < d.left + d.width) return true;
-            }
-            return false;
-        }
 
         // Putting poem fragments onto the page
         function putWords() {
