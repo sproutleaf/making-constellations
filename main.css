@@ -3,9 +3,55 @@
     src: url('assets/Rag-Regular.woff2');
 }
 
+@font-face {
+    font-family: 'ia-writer-quattro';
+    src: url('assets/iAWriterQuattro/iAWriterQuattroS-Regular.woff2');
+}
+
 html,
 body {
-    font-family: 'rag';
+    font-family: 'ia-writer-quattro';
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+p,
+h3 {
+    margin: 0;
+}
+
+#flicker {
+    color: black;
+    animation: flickerAnimation 5s infinite;
+}
+
+@keyframes flickerAnimation {
+    0% {
+        color: black;
+    }
+
+    50% {
+        color: silver;
+    }
+
+    100% {
+        color: black;
+    }
+}
+
+#intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    text-align: center;
 }
 
 .mirrored-cursor {

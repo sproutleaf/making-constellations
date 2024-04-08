@@ -32,8 +32,57 @@ function randomYCoordinate(h) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getLocalTime() {
+    var date = new Date();
+
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+
+    hours = (hours < 10 ? '0' : '') + hours;
+    minutes = (minutes < 10 ? '0' : '') + minutes;
+    seconds = (seconds < 10 ? '0' : '') + seconds;
+
+    var timeString = hours + ':' + minutes + ':' + seconds;
+
+    document.getElementById('local-time').innerHTML = 'Your local time is: ' + timeString;
+}
+
+function getUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+        alert("Geolocation is not supported by this browser!");
+    }
+}
+
+function showPosition(position) {
+    const lat = position.coords.latitude;
+    const long = position.coords.longitude;
+
+    alert("Latitude: " + lat + "\nLongitude: " + long);
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
+    }
+}
+
 $(document).ready(function () {
     if (window.matchMedia("(min-width: 768px)").matches) {
+        getLocalTime();
         $(document).mousemove(function (event) {
             let width = $(window).innerWidth();
             let height = $(window).innerHeight();
