@@ -11,7 +11,7 @@
 
 <body>
     <audio controls autoplay id="bg" src="assets/brighter-days.mp3" loop></audio>
-    <img class="mirrored-cursor" src="assets/animated-star-transparent.gif">
+    <img id="mirrored-cursor" src="assets/animated-star-transparent.gif">
 
     <section id="intro">
         <h3 class="l">When was the last time you wrote a poem?</h3>
@@ -23,6 +23,7 @@
         <p id="flicker" class="l">{ click anywhere to start }</p>
     </section>
 
+    <div id="local-time" onclick="getUserLocation()"></div>
     <div id="poem"></div>
     <div id="earth"></div>
 

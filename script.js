@@ -9,11 +9,11 @@ let p1 = ['as i', 'as you', 'as we', 'as they', 'if i', 'if you', 'if we', 'if t
 let p2 = ['embrace', 'resist', 'contemplate', 'speculate', 'tempt', 'admire', 'desire', 'imagine', 'grasp', 'release', 'ruin', 'celebrate', 'sense', 'recognize', 'find', 'share', 'seek', 'notice', 'confess', 'swallow', 'promise'];
 let p3 = ['the future', 'the present', 'the past', 'the secret', 'the path', 'the affirmation', 'the hope', 'the joy', 'the faith', 'the poetics', 'the suffering'];
 let p4 = ['we work', 'i struggle', 'we begin', 'they fail', 'the nature dances', 'we allude', 'i mimic', 'they taunt'];
-let p5 = ['to understand', 'to find', 'to unbraid', 'to accept', 'to question', 'to comprehend'];
-let p6 = ['the grief', 'the joy', 'the optimism'];
-let p7 = ['we shift', 'we wield', 'we bury'];
-let p8 = ['into light', 'as ash'];
-let p9 = ['across our faces'];
+let p5 = ['to understand', 'to find', 'to unbraid', 'to accept', 'to question', 'to comprehend', 'to evade', 'to lick', 'to treasure', 'to abide', 'to absorb', 'to accentuate', 'to acclaim', 'to acquaint', 'to adore', 'to beckon', 'to beget', 'to bequeath', 'to blaze', 'to book', 'to caress'];
+let p6 = ['the grief', 'the joy', 'the optimism', 'the love', 'the prayer', 'the meditation', 'the pain', 'the mistakes', 'the ennui', 'the passion', 'the dread', 'the kisses', 'the despair', 'the hope', 'the wound'];
+let p7 = ['we shift', 'we wield', 'we bury', 'we catch', 'we chase',];
+let p8 = ['into light', 'as ash', 'away from shadows',];
+let p9 = ['across our faces', 'along the path', 'forever ago', 'gently', 'softly',];
 
 let ps = [p1, p2, p3, p4, p5, p6, p7, p8, p9];
 let lengths = [3, 4, 5, 3, 4, 3, 3, 2, 1];
@@ -73,8 +73,6 @@ function getTimesFromLocation(location) {
     var lat = location.coords.latitude;
     var long = location.coords.longitude;
 
-    console.log("Coordinates: ", lat, long);
-
     // Using https://sunrisesunset.io/api/ to fetch the specific times of day;
     // the time data is used to generate different background effects and
     // experiences.
@@ -116,15 +114,35 @@ function getCurrentPosition() {
     });
 }
 
+function generateRandomFragments(arr, l) {
+    let randomFragments = [];
+    let generatedIndices = [];
+
+    for (let i = 0; i < l; i++) {
+        let index = Math.floor(Math.random() * arr.length);
+        // Regenerate if the index has already been chosen
+        while (generatedIndices.includes(index)) {
+            index = Math.floor(Math.random() * arr.length);
+        }
+        generatedIndices.push(index);
+        randomFragments.push(arr[index]);
+    }
+
+    return randomFragments;
+}
+
 // Putting poem fragments onto the page
 function putWords() {
     let fragments = ps[i];
+    let selected = lengths[i];
 
     // Dummy container used for detecting div collision
     const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>');
     $('body').append(container);
 
-    fragments.forEach(f => {
+    let selectedFragments = generateRandomFragments(fragments, selected);
+
+    selectedFragments.forEach(f => {
         const fDiv = $('<div class="words"></div>').text(f).hide();
         container.append(fDiv);
 
@@ -144,8 +162,6 @@ function putWords() {
                 height: fDiv.height()
             }, $('.words'));
         }
-
-        console.log(fDiv.width(), fDiv.height());
         fDiv.css({ left: x, top: y });
 
         earth.append(fDiv);
@@ -179,7 +195,7 @@ $(document).ready(function () {
             cursor.x = width - (mouse.x + os);
             cursor.y = height - (mouse.y + os);
 
-            $('.mirrored-cursor').css({
+            $('#mirrored-cursor').css({
                 'transform': 'translate(' + cursor.x + 'px , ' + cursor.y + 'px)',
                 'display': 'block'
             });
@@ -188,10 +204,21 @@ $(document).ready(function () {
 
         let prevStarCoords = null;
         $(document).on('click', '.words', function (event) {
+            console.log("i is, ", i);
+            if (i === 8) {
+                $("#defaultCanvas0").hide();
+                $(document).off('mousemove');
+                $("#mirrored-cursor").hide();
+            }
             if (i >= ps.length) return;
-            // Add fragments to poems
-            $("#poem").append($(this).html() + ' ');
+
+            if (i === 2) {
+                $("#poem").append($(this).html() + ',');
+            } else {
+                $("#poem").append($(this).html() + ' ');
+            }
             i++;
+
             if (i % 3 === 0) {
                 $("#poem").append('<br>');
             }

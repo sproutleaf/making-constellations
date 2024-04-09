@@ -62,7 +62,7 @@ h3 {
     text-align: center;
 }
 
-.mirrored-cursor {
+#mirrored-cursor {
     width: 18px;
     height: 18px;
 }
@@ -71,7 +71,7 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    background: linear-gradient(to bottom, #3D5588, #87ceeb);
+    background: linear-gradient(to bottom, #3D5588, whitesmoke);
 }
 
 #earth {
