@@ -10,23 +10,19 @@
 </head>
 
 <body>
-    <!-- <audio controls autoplay id="bg" src="assets/brighter-days.mp3" loop></audio> -->
+    <audio controls id="bg" src="assets/brighter-days.mp3" loop></audio>
     <img id="mirrored-cursor" src="assets/animated-star-transparent.gif">
 
-    <!-- <section id="intro">
-        <h3 class="l">When was the last time you wrote a poem?</h3>
-        <h3 class="l">When was the last time you contemplated the sky?</h3>
-        <br>
-        <p class="l">Clear out the distractions... Take a deep breath... </p>
-        <p class="l">Pick your favorite words, make a constellation.</p>
-        <br>
-        <p id="flicker" class="l">{ click anywhere to start }</p>
-    </section> -->
+    <section id="intro">
+        <h3 class="l">WHEN WAS THE LAST TIME YOU WROTE A POEM?<br> WHEN WAS THE LAST TIME YOU CONTEMPLATED THE SKY?</h3>
+        <p id="flicker">{ click anywhere to start }</p>
+    </section>
     <div id="c">
         <div id="local-time" onclick="getUserLocation()"></div>
         <div id="poem"></div>
         <div id="earth"></div>
     </div>
+    <div id="gradient-circle"></div>
 
     <!-- The `integrity` and `crossorigin` attributes are used for Subresource Integrity (SRI) checking. This allows browswers to ensure that resources hosted on third-party servers have not been tampered with. -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"
@@ -40,8 +36,8 @@
         }
     </script>
 
-    <script src="script.js"></script>
-    <script src="sketch.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module" src="sketch.js"></script>
     <script type="module" src="stars.js"></script>
 </body>
 

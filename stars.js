@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 const getRandomParticlePos = (particleCount) => {
-    return new Float32Array(particleCount * 3).map(() => (Math.random() - 0.5) * 10);
+    return new Float32Array(particleCount * 0.5).map(() => (Math.random() - 0.5) * 10);
 };
 
 const resizeRendererToDisplaySize = (renderer) => {
@@ -59,9 +59,18 @@ const animate = () => {
         starsT2.position.y = mouseY * -0.0001;
     }
 
+    const updateStarBrightness = () => {
+        const distanceThreshold = 3.5;
+        const cameraPosition = camera.position;
+
+        starsT1.material.opacity = Math.max(0, 1 - Math.abs(starsT1.position.distanceTo(cameraPosition)) / distanceThreshold);
+        starsT2.material.opacity = Math.max(0, 1 - Math.abs(starsT2.position.distanceTo(cameraPosition)) / distanceThreshold);
+    }
+
     const render = (time) => {
         if (resizeRendererToDisplaySize(renderer)) updateCameraAspect();
         updateStarPositions();
+        updateStarBrightness();
 
         renderer.render(scene, camera);
         requestAnimationFrame(render);

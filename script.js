@@ -3,6 +3,7 @@
 let mouse = { x: -1, y: -1 };
 let cursor = { x: -1, y: -1 };
 let os = 10;
+let fadeSpeed = 1000;
 
 // Fragments of the poems
 let p1 = ['as i', 'as you', 'as we', 'as they', 'if i', 'if you', 'if we', 'if they'];
@@ -20,6 +21,11 @@ let lengths = [3, 4, 5, 3, 4, 3, 3, 2, 1];
 let i = 0;
 
 let timesOfDay;
+// For intro sequence
+const intro = ["TAKE A DEEP BREATH", "PICK YOUR FAVORITE WORDS, AND MAKE A CONSTELLATION."];
+let clickCount = 0;
+// Checks if we have finished intro and arrived at the main experience
+export let main = false;
 
 function randomXCoordinate(w) {
     const min = Math.ceil(0.1 * w);
@@ -115,16 +121,12 @@ function getCurrentPosition() {
 }
 
 function generateRandomFragments(arr, l) {
-    let randomFragments = [];
-    let generatedIndices = [];
+    const randomFragments = [];
+    const availableIndices = arr.map((_, index) => index);
 
     for (let i = 0; i < l; i++) {
-        let index = Math.floor(Math.random() * arr.length);
-        // Regenerate if the index has already been chosen
-        while (generatedIndices.includes(index)) {
-            index = Math.floor(Math.random() * arr.length);
-        }
-        generatedIndices.push(index);
+        const randomIndex = Math.floor(Math.random() * availableIndices.length);
+        const index = availableIndices.splice(randomIndex, 1)[0];
         randomFragments.push(arr[index]);
     }
 
@@ -133,20 +135,13 @@ function generateRandomFragments(arr, l) {
 
 // Putting poem fragments onto the page
 function putWords() {
-    let fragments = ps[i];
-    let selected = lengths[i];
-
     // Dummy container used for detecting div collision
-    const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>');
-    $('body').append(container);
-
-    let selectedFragments = generateRandomFragments(fragments, selected);
+    const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>').appendTo('body');
+    let earth = $('#earth');
+    let selectedFragments = generateRandomFragments(ps[i], lengths[i]);
 
     selectedFragments.forEach(f => {
-        const fDiv = $('<div class="words"></div>').text(f).hide();
-        container.append(fDiv);
-
-        let earth = $('#earth');
+        const fDiv = $('<div class="words"></div>').text(f).hide().appendTo(container);
 
         let collision = true;
         let x, y;
@@ -162,102 +157,113 @@ function putWords() {
                 height: fDiv.height()
             }, $('.words'));
         }
-        fDiv.css({ left: x, top: y });
-
-        earth.append(fDiv);
-        fDiv.fadeIn(2000);
+        fDiv.css({ left: x, top: y }).appendTo(earth).fadeIn(2000);
     });
 
     container.remove();
 }
 
 function enter() {
-    $("#intro").fadeOut(5000, function () {
+    if (clickCount === 2) {
+        $("#intro").fadeOut(fadeSpeed, putWords);
+        $(document).off('click', enter);
+        main = true;
+    }
+    $(".l").fadeOut(fadeSpeed, function () {
+        $(".l").text(intro[clickCount]).fadeIn(fadeSpeed, () => clickCount++);
+    });
+}
+
+function moveGradientCircle(event) {
+    $("#gradient-circle").css({
+        left: event.clientX + "px",
+        top: event.clientY + "px"
+    });
+}
+
+function handleMirroredCursor() {
+    if (!main) return;
+
+    let width = $(window).innerWidth();
+    let height = $(window).innerHeight();
+
+    mouse.x = event.pageX;
+    mouse.y = event.pageY;
+
+    cursor.x = width - (mouse.x + os);
+    cursor.y = height - (mouse.y + os);
+
+    $('#mirrored-cursor').css({
+        'transform': 'translate(' + cursor.x + 'px , ' + cursor.y + 'px)',
+        'display': 'block'
+    });
+
+}
+
+$(document).ready(function () {
+    $(document).on("click", enter);
+    $(document).one('click', () => $('#bg')[0].play());
+    $(document).mousemove(moveGradientCircle);
+    $(document).mousemove(handleMirroredCursor);
+
+    // getLocalTime();
+    getLocationAndTimes();
+
+    let prevStarCoords = null;
+    $(document).on('click', '.words', function (event) {
+        console.log("i is: ", i);
+        if (i === 8) {
+            $("#defaultCanvas0").hide();
+            $(document).off('mousemove');
+            $("#mirrored-cursor").hide();
+        }
+        if (i >= ps.length) return;
+
+        if (i === 2) {
+            $("#poem").append($(this).html() + ',');
+        } else {
+            $("#poem").append($(this).html() + ' ');
+        }
+        i++;
+
+        if (i % 3 === 0) {
+            $("#poem").append('<br>');
+        }
+
+        // Placing stars
+        let width = $(window).innerWidth();
+        let height = $(window).innerHeight();
+
+        let x = width - event.clientX;
+        let y = height - event.clientY;
+
+        let star = $("<div>").addClass("star").html("✱").css({
+            left: x + "px",
+            top: y + "px"
+        });
+        $("body").append(star);
+
+        // drawing lines between them
+        if (prevStarCoords !== null) {
+            var distance = Math.sqrt(Math.pow(prevStarCoords[0] - x, 2) + Math.pow(prevStarCoords[1] - y, 2));
+            var angle = Math.atan2(y - prevStarCoords[1], x - prevStarCoords[0]);
+
+            var lineElement = $("<div>").addClass("line").css({
+                left: (prevStarCoords[0] + os) + "px",
+                top: (prevStarCoords[1] + os) + "px",
+                width: distance + "px",
+                transform: "rotate(" + angle + "rad)"
+            });
+
+            $("body").append(lineElement);
+        };
+        prevStarCoords = [x, y];
+
+        // Delete the previous fragments, generate new ones
+        $("#earth").children().fadeOut(2000, function () {
+            $(this).remove();
+        });
         putWords();
     });
 
-    $(document).off('click', enter);
-}
-$(document).on('click', enter);
-
-$(document).ready(function () {
-    if (window.matchMedia("(min-width: 768px)").matches) {
-        // getLocalTime();
-        getLocationAndTimes();
-
-        $(document).mousemove(function (event) {
-            let width = $(window).innerWidth();
-            let height = $(window).innerHeight();
-
-            mouse.x = event.pageX;
-            mouse.y = event.pageY;
-
-            cursor.x = width - (mouse.x + os);
-            cursor.y = height - (mouse.y + os);
-
-            $('#mirrored-cursor').css({
-                'transform': 'translate(' + cursor.x + 'px , ' + cursor.y + 'px)',
-                'display': 'block'
-            });
-        });
-
-
-        let prevStarCoords = null;
-        $(document).on('click', '.words', function (event) {
-            console.log("i is, ", i);
-            if (i === 8) {
-                $("#defaultCanvas0").hide();
-                $(document).off('mousemove');
-                $("#mirrored-cursor").hide();
-            }
-            if (i >= ps.length) return;
-
-            if (i === 2) {
-                $("#poem").append($(this).html() + ',');
-            } else {
-                $("#poem").append($(this).html() + ' ');
-            }
-            i++;
-
-            if (i % 3 === 0) {
-                $("#poem").append('<br>');
-            }
-
-            // Placing stars
-            let width = $(window).innerWidth();
-            let height = $(window).innerHeight();
-
-            let x = width - event.clientX;
-            let y = height - event.clientY;
-
-            let star = $("<div>").addClass("star").html("★").css({
-                left: x + "px",
-                top: y + "px"
-            });
-            $("body").append(star);
-
-            // drawing lines between them
-            if (prevStarCoords !== null) {
-                var distance = Math.sqrt(Math.pow(prevStarCoords[0] - x, 2) + Math.pow(prevStarCoords[1] - y, 2));
-                var angle = Math.atan2(y - prevStarCoords[1], x - prevStarCoords[0]);
-
-                var lineElement = $("<div>").addClass("line").css({
-                    left: (prevStarCoords[0] + os) + "px",
-                    top: (prevStarCoords[1] + os) + "px",
-                    width: distance + "px",
-                    transform: "rotate(" + angle + "rad)"
-                });
-
-                $("body").append(lineElement);
-            };
-            prevStarCoords = [x, y];
-
-            // Delete the previous fragments, generate new ones
-            $("#earth").children().fadeOut(2000, function () {
-                $(this).remove();
-            });
-            putWords();
-        });
-
-    }
 });
