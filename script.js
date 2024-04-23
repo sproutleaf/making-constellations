@@ -3,7 +3,7 @@
 let mouse = { x: -1, y: -1 };
 let cursor = { x: -1, y: -1 };
 let os = 5;
-let fadeSpeed = 1000;
+let fadeSpeed = 2000;
 
 // Fragments of the poems
 let p1 = ['as i', 'as you', 'as we', 'as they', 'if i', 'if you', 'if we', 'if they'];
@@ -18,7 +18,11 @@ let p9 = ['across our faces', 'along the path', 'forever ago', 'gently', 'softly
 
 let ps = [p1, p2, p3, p4, p5, p6, p7, p8, p9];
 let lengths = [3, 4, 5, 3, 4, 3, 3, 2, 1];
+
+// Initial states for a new poem/constellation
 let i = 0;
+let prevStarCoords = null;
+let mainDivs = ["#poem", "#constellation", "#earth"];
 
 let timesOfDay;
 // For intro sequence
@@ -136,15 +140,38 @@ function generateRandomFragments(arr, l) {
     return randomFragments;
 }
 
+function startWeaving() {
+    // Reset initial states
+    i = 0;
+    prevStarCoords = null;
+
+    // Remove everything already on the screen—poems, constellations, words
+    let divsCompleted = 0;
+    for (const div of mainDivs) {
+        $(div).fadeOut(fadeSpeed, function () {
+            $(this).empty();
+            divsCompleted++;
+            if (divsCompleted === mainDivs.length) {
+                putWords();
+            }
+        });
+    }
+}
+
 // Putting poem fragments onto the page
 function putWords() {
-    // Dummy container used for detecting div collision
-    const container = $('<div style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>').appendTo('body');
+    if ($("#constellation").is(":empty")) {
+        $("#constellation").append($("<div id='poem'></div>"));
+    }
+    for (const div of mainDivs) {
+        if ($(div).css("display") === "none") $(div).show();
+    }
+
     let earth = $('#earth');
     let selectedFragments = generateRandomFragments(ps[i], lengths[i]);
 
     selectedFragments.forEach(f => {
-        const fDiv = $('<div class="words"></div>').text(f.toUpperCase()).hide().appendTo(container);
+        const fDiv = $('<div class="words"></div>').text(f.toUpperCase()).hide().appendTo("#help");
 
         let collision = true;
         let x, y;
@@ -162,18 +189,24 @@ function putWords() {
         }
         fDiv.css({ left: x, top: y }).appendTo(earth).fadeIn(2000);
     });
-
-    container.remove();
 }
 
 function enter() {
+    $(document).off("click", enter);
     if (clickCount === 2) {
         $("#intro").fadeOut(fadeSpeed, putWords);
         $(document).off('click', enter);
         main = true;
     }
     $(".l").fadeOut(fadeSpeed, function () {
-        $(".l").text(intro[clickCount]).fadeIn(fadeSpeed, () => clickCount++);
+        $(".l").text(intro[clickCount]).fadeIn(fadeSpeed, () => {
+            clickCount++;
+            if (clickCount === 2) {
+                console.log("begin fade in");
+                $("#begin").hide().fadeIn(fadeSpeed * 2);
+            }
+            $(document).on("click", enter);
+        });
     });
 }
 
@@ -216,14 +249,13 @@ $(document).ready(function () {
     // getLocalTime();
     getLocationAndTimes();
 
-    let prevStarCoords = null;
     $(document).on('click', '.words', function (event) {
-        console.log("i is: ", i);
         if (i === 8) {
             main = false;
-            $("#defaultCanvas0").hide();
             $("#mirrored-cursor").css("visibility", "hidden");
+            $("#metadata").hide().fadeIn(fadeSpeed);
         }
+
         if (i >= ps.length) return;
 
         if (i === 2) {
@@ -270,11 +302,17 @@ $(document).ready(function () {
         $("#earth").children().fadeOut(2000, function () {
             $(this).remove();
         });
+
         putWords();
     });
 
     $('#capture').click(function () {
-        html2canvas(document.getElementById("c")).then(function (canvas) {
+        const options = {
+            allowTaint: true,
+            backgroundColor: `#090139`
+        }
+        html2canvas(document.getElementById("constellation"), options).then(function (canvas) {
+
             var imageData = canvas.toDataURL('image/png');
             var downloadLink = $('<a></a>').attr({
                 'href': imageData,
@@ -294,4 +332,12 @@ $(document).ready(function () {
             info.css('display', 'inline-block');
         }
     })
+
+    $("#reset").on("click", function () {
+        main = true;
+        startWeaving();
+        $("#metadata").fadeOut(fadeSpeed, function () {
+            $(this).hide();
+        });
+    });
 });

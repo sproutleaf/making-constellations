@@ -39,21 +39,12 @@ h3 {
     pointer-events: none;
 }
 
-#flicker {
-    color: black;
-    animation: flickerAnimation 5s infinite;
-}
-
-@keyframes flickerAnimation {
-
-    0%,
-    100% {
-        color: black;
-    }
-
-    50% {
-        color: silver;
-    }
+#begin {
+    position: absolute;
+    color: whitesmoke;
+    bottom: 10vh;
+    font-size: 1vw;
+    display: none;
 }
 
 #intro {
@@ -130,6 +121,7 @@ h3 {
     height: 100%;
     z-index: 1;
     pointer-events: none;
+    display: none;
 }
 
 #reset {
@@ -145,12 +137,15 @@ h3 {
 }
 
 #about,
-#capture {
+#capture,
+#reset {
     pointer-events: all;
+    cursor: crosshair;
 }
 
 #about:hover,
 #capture:hover,
+#reset:hover,
 .underline,
 .words:hover {
     text-decoration: underline;

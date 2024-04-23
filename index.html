@@ -10,29 +10,33 @@
 </head>
 
 <body>
-    <audio controls muted id="bg" src="assets/brighter-days.mp3" loop></audio>
+    <audio controls id="bg" src="assets/brighter-days.mp3" loop></audio>
 
     <section id="intro">
         <h3 class="l">WHEN WAS THE LAST TIME YOU WROTE A POEM?<br> WHEN WAS THE LAST TIME YOU CONTEMPLATED THE SKY?</h3>
-        <!-- <p id="flicker">{ click anywhere to start }</p> -->
+        <p id="begin">{ CLICK ANYWHERE TO START }</p>
     </section>
     <div id="c">
         <div id="mirrored-cursor">✱</div>
-        <div id="poem"></div>
-        <div id="constellation"></div>
+        <div id="constellation">
+            <div id="poem"></div>
+        </div>
         <div id="earth"></div>
     </div>
     <div id="gradient-circle"></div>
     <div id="metadata">
         <div id="reset">✱</div>
         <div id="bottom">
-            <div id="info"><span id="about">about</span>
+            <div id="info"><span id="about">ABOUT</span>
                 <div id="detailed-info">Making Constellations is a collaboration
-                    between Miaoye Que and Mouthwash Research Center. April 2022.</div>
+                    between Miaoye Que and Mouthwash Research Center. April 2024.</div>
             </div>
-            <div id="capture">capture</div>
+            <div id="capture">CAPTURE</div>
         </div>
     </div>
+
+    <!-- Dummy container used for detecting div collision -->
+    <div id="help" style="position: absolute; visibility: hidden; width: 100vw; height: 100vh;"></div>
 
     <!-- The `integrity` and `crossorigin` attributes are used for Subresource Integrity (SRI) checking. This allows browswers to ensure that resources hosted on third-party servers have not been tampered with. -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"
@@ -48,7 +52,6 @@
     </script>
 
     <script type="module" src="script.js"></script>
-    <script type="module" src="sketch.js"></script>
     <script type="module" src="stars.js"></script>
 </body>
 
