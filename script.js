@@ -2,7 +2,7 @@
 // position of the mirrored mouse
 let mouse = { x: -1, y: -1 };
 let cursor = { x: -1, y: -1 };
-let os = 10;
+let os = 5;
 let fadeSpeed = 1000;
 
 // Fragments of the poems
@@ -46,7 +46,10 @@ function checkDivCollision(div, existingDivs) {
         if (div.top + div.height > d.top &&
             div.top < d.top + d.height &&
             div.left + div.width > d.left &&
-            div.left < d.left + d.width) return true;
+            div.left < d.left + d.width) {
+            console.log("collision detected!");
+            return true;
+        }
     }
     return false;
 }
@@ -141,7 +144,7 @@ function putWords() {
     let selectedFragments = generateRandomFragments(ps[i], lengths[i]);
 
     selectedFragments.forEach(f => {
-        const fDiv = $('<div class="words"></div>').text(f).hide().appendTo(container);
+        const fDiv = $('<div class="words"></div>').text(f.toUpperCase()).hide().appendTo(container);
 
         let collision = true;
         let x, y;
@@ -184,6 +187,10 @@ function moveGradientCircle(event) {
 function handleMirroredCursor() {
     if (!main) return;
 
+    if ($("#mirrored-cursor").css("visibility") === "hidden") {
+        $("#mirrored-cursor").css("visibility", "visible");
+    }
+
     let width = $(window).innerWidth();
     let height = $(window).innerHeight();
 
@@ -213,9 +220,9 @@ $(document).ready(function () {
     $(document).on('click', '.words', function (event) {
         console.log("i is: ", i);
         if (i === 8) {
+            main = false;
             $("#defaultCanvas0").hide();
-            $(document).off('mousemove');
-            $("#mirrored-cursor").hide();
+            $("#mirrored-cursor").css("visibility", "hidden");
         }
         if (i >= ps.length) return;
 
@@ -241,7 +248,7 @@ $(document).ready(function () {
             left: x + "px",
             top: y + "px"
         });
-        $("body").append(star);
+        $("#constellation").append(star);
 
         // drawing lines between them
         if (prevStarCoords !== null) {
@@ -250,12 +257,12 @@ $(document).ready(function () {
 
             var lineElement = $("<div>").addClass("line").css({
                 left: (prevStarCoords[0] + os) + "px",
-                top: (prevStarCoords[1] + os) + "px",
+                top: (prevStarCoords[1] + 2 * os) + "px",
                 width: distance + "px",
                 transform: "rotate(" + angle + "rad)"
             });
 
-            $("body").append(lineElement);
+            $("#constellation").append(lineElement);
         };
         prevStarCoords = [x, y];
 
@@ -266,4 +273,25 @@ $(document).ready(function () {
         putWords();
     });
 
+    $('#capture').click(function () {
+        html2canvas(document.getElementById("c")).then(function (canvas) {
+            var imageData = canvas.toDataURL('image/png');
+            var downloadLink = $('<a></a>').attr({
+                'href': imageData,
+                'download': 'making-constellation.png'
+            }).appendTo('body');
+            downloadLink[0].click();
+            downloadLink.remove();
+        });
+    });
+
+    $("#about").click(function () {
+        $(this).toggleClass('underline');
+
+        let info = $('#detailed-info');
+        info.toggle();
+        if (info.is(':visible')) {
+            info.css('display', 'inline-block');
+        }
+    })
 });
