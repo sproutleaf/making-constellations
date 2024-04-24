@@ -9,7 +9,7 @@ const resizeRendererToDisplaySize = (renderer) => {
     const needResize =
         canvas.width !== canvas.clientWidth ||
         canvas.height !== canvas.clientHeight;
-    if (needResize) renderer.setSize(width, height, false);
+    if (needResize) renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     return needResize;
 };
 
