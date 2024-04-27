@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+let scene = null;
+let animationRequest = null;
+
 const getRandomParticlePos = (particleCount) => {
     return new Float32Array(particleCount * 0.5).map(() => (Math.random() - 0.5) * 10);
 };
@@ -25,7 +28,7 @@ const animate = () => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0);
     document.body.appendChild(renderer.domElement);
-    const scene = new THREE.Scene();
+    scene = new THREE.Scene();
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(-1, 2, 4);
@@ -75,7 +78,28 @@ const animate = () => {
         renderer.render(scene, camera);
         requestAnimationFrame(render);
     };
-    requestAnimationFrame(render);
+    animationRequest = requestAnimationFrame(render);
+};
+
+const deleteScene = () => {
+    scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+            object.geometry.dispose();
+            object.material.dispose();
+        }
+    });
+
+    scene.background = null;
+    scene = null;
+
+    clearInterval(displayCheckInterval);
+    cancelAnimationFrame(animationRequest);
+};
+
+const checkIntroDisplay = () => {
+    const introDisplay = $('#intro').css('display');
+    if (introDisplay === 'none') deleteScene();
 };
 
 animate();
+const displayCheckInterval = setInterval(checkIntroDisplay, 500);

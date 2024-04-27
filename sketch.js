@@ -1,23 +1,31 @@
-function setup() {
-    let canvas = createCanvas(windowWidth, windowHeight);
-    canvas.style('position', 'fixed');
-    canvas.style('top', '0');
-    canvas.style('z-index', '-1');
-}
+const os = 3;
 
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-}
+if (window.matchMedia("(min-width: 768px)").matches) {
+    function setup() {
+        let canvas = createCanvas(windowWidth, windowHeight);
+        canvas.style('position', 'fixed');
+        canvas.style('top', '0');
+        canvas.style('pointer-events', 'none')
+        canvas.style('z-index', '1');
+    }
 
-function mouseMoved() {
-    let width = windowWidth;
-    let height = windowHeight;
+    function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+    }
 
-    clear();
-    let cursorX = width - mouseX;
-    let cursorY = height - mouseY;
+    function mouseMoved() {
+        let width = windowWidth;
+        let height = windowHeight;
 
-    stroke('white');
-    strokeWeight(1);
-    line(mouseX, mouseY, cursorX, cursorY);
+        clear();
+        let cursorX = width - (mouseX - os);
+        let cursorY = height - (mouseY - os);
+
+        if ($('#intro').css('display') === 'none' &&
+            $('#metadata').css('display') !== 'block') {
+            stroke('white');
+            strokeWeight(1);
+            line(mouseX, mouseY, cursorX, cursorY);
+        }
+    }
 }

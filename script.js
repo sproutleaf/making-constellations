@@ -312,7 +312,6 @@ $(document).ready(function () {
             backgroundColor: `#090139`
         }
         html2canvas(document.getElementById("constellation"), options).then(function (canvas) {
-
             var imageData = canvas.toDataURL('image/png');
             var downloadLink = $('<a></a>').attr({
                 'href': imageData,
@@ -324,13 +323,9 @@ $(document).ready(function () {
     });
 
     $("#about").click(function () {
-        $(this).toggleClass('underline');
-
-        let info = $('#detailed-info');
-        info.toggle();
-        if (info.is(':visible')) {
-            info.css('display', 'inline-block');
-        }
+        let t = $(this).text() === "( )" ?
+            "( Making Constellations is a collaboration between Miaoye Que and Mouthwash Research Center. May 2024. )" : "( )";
+        $(this).text(t);
     })
 
     $("#reset").on("click", function () {
