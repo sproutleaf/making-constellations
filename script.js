@@ -24,7 +24,6 @@ let i = 0;
 let prevStarCoords = null;
 let mainDivs = ["#poem", "#constellation", "#earth"];
 
-let timesOfDay;
 // For intro sequence
 const intro = [" Take a deep breath.", " Pick your favorite words,", " and make a constellation.", " Click anywhere to begin."];
 let clickCount = 0;
@@ -56,75 +55,6 @@ function checkDivCollision(div, existingDivs) {
         }
     }
     return false;
-}
-
-function getLocalTime() {
-    var date = new Date();
-
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
-
-    hours = (hours < 10 ? '0' : '') + hours;
-    minutes = (minutes < 10 ? '0' : '') + minutes;
-    seconds = (seconds < 10 ? '0' : '') + seconds;
-
-    var timeString = hours + ':' + minutes + ':' + seconds;
-
-    document.getElementById('local-time').innerHTML = 'Your local time is: ' + timeString;
-}
-
-function getLocationAndTimes() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(getTimesFromLocation, showError);
-    } else {
-        document.getElementById('location').innerHTML = 'Geolocation is not supported by this browser.';
-    }
-}
-
-function getTimesFromLocation(location) {
-    var lat = location.coords.latitude;
-    var long = location.coords.longitude;
-
-    // Using https://sunrisesunset.io/api/ to fetch the specific times of day;
-    // the time data is used to generate different background effects and
-    // experiences.
-    const url = `https://api.sunrisesunset.io/json?lat=${lat}&lng=${long}`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            timesOfDay = data.results;
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function showError(error) {
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            document.getElementById('location').innerHTML = 'User denied the request for Geolocation.';
-            break;
-        case error.POSITION_UNAVAILABLE:
-            document.getElementById('location').innerHTML = 'Location information is unavailable.';
-            break;
-        case error.TIMEOUT:
-            document.getElementById('location').innerHTML = 'The request to get user location timed out.';
-            break;
-        case error.UNKNOWN_ERROR:
-            document.getElementById('location').innerHTML = 'An unknown error occurred.';
-            break;
-    }
-}
-
-function getCurrentPosition() {
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-        } else {
-            reject("Geolocation is not supported by this browser.");
-        }
-    });
 }
 
 function generateRandomFragments(arr, l) {
