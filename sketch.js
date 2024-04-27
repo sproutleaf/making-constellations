@@ -1,4 +1,4 @@
-const os = 3;
+const os = 5;
 
 if (window.matchMedia("(min-width: 768px)").matches) {
     function setup() {
@@ -18,7 +18,7 @@ if (window.matchMedia("(min-width: 768px)").matches) {
         let height = windowHeight;
 
         clear();
-        let cursorX = width - (mouseX - os);
+        let cursorX = width - (mouseX);
         let cursorY = height - (mouseY - os);
 
         if ($('#intro').css('display') === 'none' &&

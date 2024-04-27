@@ -26,7 +26,7 @@ let mainDivs = ["#poem", "#constellation", "#earth"];
 
 let timesOfDay;
 // For intro sequence
-const intro = ["TAKE A DEEP BREATH", "PICK YOUR FAVORITE WORDS, AND MAKE A CONSTELLATION."];
+const intro = [" Take a deep breath.", " Pick your favorite words,", " and make a constellation.", " Click anywhere to begin."];
 let clickCount = 0;
 // Checks if we have finished intro and arrived at the main experience
 export let main = false;
@@ -193,21 +193,24 @@ function putWords() {
 
 function enter() {
     $(document).off("click", enter);
-    if (clickCount === 2) {
+    if (clickCount === 4) {
         $("#intro").fadeOut(fadeSpeed, putWords);
         $(document).off('click', enter);
         main = true;
+    } else {
+        let div = $("#l");
+        let text = div.text();
+        console.log(text);
+
+        var curText = $('<span class="grey-text"></span>').text(text);
+        var newText = $('<span style="display: none;"></span>').text(intro[clickCount++]);
+        div.empty();
+        div.append(curText);
+        div.append(newText);
+        newText.fadeIn(fadeSpeed);
+
+        $(document).on('click', enter);
     }
-    $(".l").fadeOut(fadeSpeed, function () {
-        $(".l").text(intro[clickCount]).fadeIn(fadeSpeed, () => {
-            clickCount++;
-            if (clickCount === 2) {
-                console.log("begin fade in");
-                $("#begin").hide().fadeIn(fadeSpeed * 2);
-            }
-            $(document).on("click", enter);
-        });
-    });
 }
 
 function moveGradientCircle(event) {
