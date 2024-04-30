@@ -22,7 +22,7 @@ if (window.matchMedia("(min-width: 768px)").matches) {
         let cursorY = height - (mouseY - os);
 
         if ($('#intro').css('display') === 'none' &&
-            $('#metadata').css('display') !== 'block') {
+            $('#metadata').css('visibility') === 'hidden') {
             stroke('white');
             strokeWeight(1);
             line(mouseX, mouseY, cursorX, cursorY);
