@@ -45,16 +45,16 @@ function randomYCoordinate(h) {
 }
 
 function checkDivCollision(div, existingDivs) {
-    for (let d of existingDivs) {
-        if (div.top + div.height > d.top &&
-            div.top < d.top + d.height &&
-            div.left + div.width > d.left &&
-            div.left < d.left + d.width) {
-            console.log("collision detected!");
-            return true;
-        }
-    }
-    return false;
+    let divArray = existingDivs.toArray();
+
+    return divArray.some(d => {
+        let dWidth = d.offsetWidth;
+        let dHeight = d.offsetHeight;
+        return div.top + div.height > d.offsetTop &&
+            div.top < d.offsetTop + dHeight &&
+            div.left + div.width > d.offsetLeft &&
+            div.left < d.offsetLeft + dWidth;
+    });
 }
 
 function generateRandomFragments(arr, l) {
@@ -101,7 +101,7 @@ function putWords() {
     let selectedFragments = generateRandomFragments(ps[i], lengths[i]);
 
     selectedFragments.forEach(f => {
-        const fDiv = $('<div class="words"></div>').text(f.toUpperCase()).hide().appendTo("#help");
+        const fDiv = $('<div class="words"></div>').text(f).hide().appendTo(earth);
 
         let collision = true;
         let x, y;
@@ -115,7 +115,7 @@ function putWords() {
                 top: y,
                 width: fDiv.width(),
                 height: fDiv.height()
-            }, $('.words'));
+            }, $(".words"));
         }
         fDiv.css({ left: x, top: y }).appendTo(earth).fadeIn(2000);
     });
@@ -130,24 +130,10 @@ function enter() {
     } else {
         let div = $("#l");
         let text = div.text();
-        console.log(text);
-
-        var curText = $('<span class="grey-text"></span>').text(text);
-        var newText = $('<span style="display: none;"></span>').text(intro[clickCount++]);
-        div.empty();
-        div.append(curText);
-        div.append(newText);
-        newText.fadeIn(fadeSpeed);
-
-        $(document).on('click', enter);
+        div.html(`<span class="grey-text">${text}</span><span style="display: none;">${intro[clickCount++]}</span>`);
+        div.children().last().fadeIn(fadeSpeed);
+        $(document).on("click", enter);
     }
-}
-
-function moveGradientCircle(event) {
-    $("#gradient-circle").css({
-        left: event.clientX + "px",
-        top: event.clientY + "px"
-    });
 }
 
 function handleMirroredCursor() {
@@ -175,12 +161,11 @@ function handleMirroredCursor() {
 
 $(document).ready(function () {
     $(document).on("click", enter);
-    $(document).one('click', () => $('#bg')[0].play());
-    $(document).mousemove(moveGradientCircle);
+    $(document).one('click', () => {
+        $('#bg')[0].volume = 0.1;
+        $('#bg')[0].play()
+    });
     $(document).mousemove(handleMirroredCursor);
-
-    // getLocalTime();
-    getLocationAndTimes();
 
     $(document).on('click', '.words', function (event) {
         if (i === 8) {
