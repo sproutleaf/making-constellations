@@ -197,23 +197,25 @@ function endPoemCreation() {
 
 function handleWordClick(event) {
     if (i > ps.length) return;
+    $(document).off('click', '.words', handleWordClick);
 
     // Visual structure of the poem
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-        $("#poem").append($(this).html() + ' ');
-        i++;
-    } else {
-        $("#poem").append($(this).html() + '<br>');
-        i++;
-    }
+    const content = $(this).html();
+    const separator = /Mobi|Android/i.test(navigator.userAgent) ? ' ' : '<br>';
+    $("#poem").append(content + separator);
+    i++;
     $("#poem").append((i % 3 === 0) ? '<br>' : '');
 
     placeStarAndDrawLine(event);
 
     // Delete the previous fragments, generate new ones
-    $("#earth").children().not("#poem").fadeOut(2000, function () {
+    $("#earth").children().not("#poem").fadeOut(fadeSpeed, function () {
         $(this).remove();
     });
+
+    setTimeout(() => {
+        $(document).on('click', '.words', handleWordClick);
+    }, fadeSpeed - 200);
 
     if (i === ps.length) {
         endPoemCreation();
@@ -232,12 +234,7 @@ $(document).ready(function () {
             enter();
         }
     });
-
-    enterInterval = setInterval(() => {
-        if (!clicked) {
-            enter();
-        }
-    }, 5000);
+    enterInterval = setInterval(enter, 5000);
 
     $(document).one('click', () => {
         $('#bg')[0].volume = 0.1;
@@ -248,13 +245,8 @@ $(document).ready(function () {
     // Handles the mute / unmute button
     $('#mute').click(function () {
         let audio = $('#bg')[0];
-        if ($(this).text().includes('(mute)')) {
-            audio.muted = true;
-            $(this).text('(unmute)');
-        } else {
-            audio.muted = false;
-            $(this).text('(mute)');
-        }
+        audio.muted = !audio.muted;
+        $(this).text(audio.muted ? '(unmute)' : '(mute)');
     });
 
     // Handles transitioning between words
@@ -262,18 +254,12 @@ $(document).ready(function () {
 
     // Handles screen capture after a constellation is made
     $('#capture').click(function () {
-        const options = {
-            allowTaint: true,
-            backgroundColor: `#090139`
-        }
-        html2canvas(document.getElementById("constellation"), options).then(function (canvas) {
-            var imageData = canvas.toDataURL('image/png');
-            var downloadLink = $('<a></a>').attr({
-                'href': imageData,
-                'download': 'making-constellation.png'
-            }).appendTo('body');
-            downloadLink[0].click();
-            downloadLink.remove();
+        html2canvas(document.getElementById("constellation"), { allowTaint: true, backgroundColor: '#090139' }).then(canvas => {
+            const imageData = canvas.toDataURL('image/png');
+            $('<a>', {
+                href: imageData,
+                download: 'making-constellation.png'
+            }).appendTo('body')[0].click().remove();
         });
     });
 
