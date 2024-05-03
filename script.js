@@ -5,6 +5,8 @@ let cursor = { x: -1, y: -1 };
 let os = 5;
 let fadeSpeed = 2000;
 let constellationCount = 0;
+let enterInterval;
+let clicked = false;
 
 // Fragments of the poems
 let p1 = ['as i', 'as you', 'as we', 'as they', 'if i', 'if you', 'if we', 'if they'];
@@ -26,8 +28,8 @@ let prevStarCoords = null;
 let mainDivs = ["#poem", "#earth"];
 
 // For intro sequence
-const intro = [" Take a deep breath.", " Pick your favorite words,", " and make a constellation.", " Click anywhere to begin."];
-let clickCount = 0;
+const intro = [" Pick your favorite words, and make a constellation.", " Click anywhere to begin."];
+let enterCount = 0, clickCount = 0;
 // Checks if we have finished intro and arrived at the main experience
 export let main = false;
 
@@ -126,7 +128,8 @@ function putWords() {
 
 function enter() {
     $(document).off("click", enter);
-    if (clickCount === 4) {
+    if (clickCount === 2) {
+        clearInterval(enterInterval);
         $("#intro").fadeOut(fadeSpeed, putWords);
         $(document).off('click', enter);
         main = true;
@@ -163,7 +166,20 @@ function handleMirroredCursor() {
 }
 
 $(document).ready(function () {
-    $(document).on("click", enter);
+    $(document).on("click", function () {
+        if (!clicked) {
+            clicked = true;
+            clearInterval(enterInterval);
+            enter();
+        }
+    });
+
+    enterInterval = setInterval(() => {
+        if (!clicked) {
+            enter();
+        }
+    }, 5000);
+
     $(document).one('click', () => {
         $('#bg')[0].volume = 0.1;
         $('#bg')[0].play()
