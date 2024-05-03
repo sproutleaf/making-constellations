@@ -158,7 +158,69 @@ function handleMirroredCursor() {
         'transform': 'translate(' + cursor.x + 'px , ' + cursor.y + 'px)',
         'display': 'block'
     });
+}
 
+function placeStarAndDrawLine(event) {
+    let width = $(window).innerWidth();
+    let height = $(window).innerHeight();
+
+    let x = width - event.clientX;
+    let y = height - event.clientY;
+
+    let star = $("<div>").addClass("star").html("✱").css({
+        left: x + "px",
+        top: y + "px"
+    });
+    $("#constellation").append(star);
+
+    if (prevStarCoords !== null) {
+        var distance = Math.sqrt(Math.pow(prevStarCoords[0] - x, 2) + Math.pow(prevStarCoords[1] - y, 2));
+        var angle = Math.atan2(y - prevStarCoords[1], x - prevStarCoords[0]);
+
+        var lineElement = $("<div>").addClass("line").css({
+            left: (prevStarCoords[0] + os) + "px",
+            top: (prevStarCoords[1] + 2 * os) + "px",
+            width: distance + "px",
+            transform: "rotate(" + angle + "rad)"
+        });
+
+        $("#constellation").append(lineElement);
+    }
+    prevStarCoords = [x, y];
+}
+
+function endPoemCreation() {
+    main = false;
+    $("#mirrored-cursor").css("visibility", "hidden");
+    $("#metadata").css("visibility", "visible").hide().fadeIn(fadeSpeed);
+}
+
+function handleWordClick(event) {
+    if (i > ps.length) return;
+
+    // Visual structure of the poem
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        $("#poem").append($(this).html() + ' ');
+        i++;
+    } else {
+        $("#poem").append($(this).html() + '<br>');
+        i++;
+    }
+    $("#poem").append((i % 3 === 0) ? '<br>' : '');
+
+    placeStarAndDrawLine(event);
+
+    // Delete the previous fragments, generate new ones
+    $("#earth").children().not("#poem").fadeOut(2000, function () {
+        $(this).remove();
+    });
+
+    if (i === ps.length) {
+        endPoemCreation();
+        return;
+    }
+
+    putWords();
 }
 
 $(document).ready(function () {
@@ -196,61 +258,7 @@ $(document).ready(function () {
     });
 
     // Handles transitioning between words
-    $(document).on('click', '.words', function (event) {
-        if (i > ps.length) return;
-
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            $("#poem").append($(this).html() + ' ');
-            i++;
-        } else {
-            $("#poem").append($(this).html() + '<br>');
-            i++;
-        }
-        $("#poem").append((i % 3 === 0) ? '<br>' : '');
-
-        // Placing stars
-        let width = $(window).innerWidth();
-        let height = $(window).innerHeight();
-
-        let x = width - event.clientX;
-        let y = height - event.clientY;
-
-        let star = $("<div>").addClass("star").html("✱").css({
-            left: x + "px",
-            top: y + "px"
-        });
-        $("#constellation").append(star);
-
-        // drawing lines between them
-        if (prevStarCoords !== null) {
-            var distance = Math.sqrt(Math.pow(prevStarCoords[0] - x, 2) + Math.pow(prevStarCoords[1] - y, 2));
-            var angle = Math.atan2(y - prevStarCoords[1], x - prevStarCoords[0]);
-
-            var lineElement = $("<div>").addClass("line").css({
-                left: (prevStarCoords[0] + os) + "px",
-                top: (prevStarCoords[1] + 2 * os) + "px",
-                width: distance + "px",
-                transform: "rotate(" + angle + "rad)"
-            });
-
-            $("#constellation").append(lineElement);
-        };
-        prevStarCoords = [x, y];
-
-        // Delete the previous fragments, generate new ones
-        $("#earth").children().not("#poem").fadeOut(2000, function () {
-            $(this).remove();
-        });
-
-        if (i === ps.length) {
-            main = false;
-            $("#mirrored-cursor").css("visibility", "hidden");
-            $("#metadata").css("visibility", "visible").hide().fadeIn(fadeSpeed);
-            return;
-        }
-
-        putWords();
-    });
+    $(document).on('click', '.words', handleWordClick);
 
     // Handles screen capture after a constellation is made
     $('#capture').click(function () {
