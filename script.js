@@ -4,7 +4,6 @@ let mouse = { x: -1, y: -1 };
 let cursor = { x: -1, y: -1 };
 let os = 5;
 let fadeSpeed = 2000;
-let constellationCount = 0;
 let enterInterval;
 let clicked = false;
 
@@ -25,7 +24,7 @@ let lengths = [3, 4, 5, 3, 4, 3, 3, 2, 1];
 // Initial states for a new poem/constellation
 let i = 0;
 let prevStarCoords = null;
-let mainDivs = ["#poem", "#earth"];
+let mainDivs = ["#constellation", "#poem", "#earth"];
 
 // For intro sequence
 const intro = [" Pick your favorite words, and make a constellation.", " Click anywhere to begin."];
@@ -78,15 +77,11 @@ function startWeaving() {
     prevStarCoords = null;
 
     $("#metadata").fadeOut(fadeSpeed, function () {
-        $(this).hide();
+        $(this).css("visibility", "hidden");
     });
-
-    for (let i = 0; i < constellationCount; i++) {
-        let opacity = $(`constellation${i}`).css('opacity') || 1;
-        let newOp = Math.max(0.1, opacity - 0.4);
-        $(`#constellation${i}`).css('opacity', newOp);
-    }
-
+    $("#constellation").fadeOut(fadeSpeed, function () {
+        $(this).empty();
+    });
     $("#earth").fadeOut(fadeSpeed, function () {
         $(this).empty();
         putWords();
@@ -95,16 +90,17 @@ function startWeaving() {
 
 // Putting poem fragments onto the page
 function putWords() {
-    let earth = $('#earth');
-    if (earth.is(":empty")) {
-        earth.append($("<div id='poem'></div>"));
+    let constellation = $('#constellation');
+    if (constellation.is(":empty")) {
+        constellation.append($("<div id='earth'><div id='poem'></div></div>"));
     }
+
     for (const div of mainDivs) {
         if ($(div).css("display") === "none") $(div).show();
     }
 
+    let earth = $('#earth');
     let selectedFragments = generateRandomFragments(ps[i], lengths[i]);
-
     selectedFragments.forEach(f => {
         const fDiv = $('<div class="words"></div>').text(f).hide().appendTo(earth);
 
@@ -166,6 +162,7 @@ function handleMirroredCursor() {
 }
 
 $(document).ready(function () {
+    // Handles the intro sequence
     $(document).on("click", function () {
         if (!clicked) {
             clicked = true;
@@ -186,12 +183,20 @@ $(document).ready(function () {
     });
     $(document).mousemove(handleMirroredCursor);
 
+    // Handles the mute / unmute button
+    $('#mute').click(function () {
+        let audio = $('#bg')[0];
+        if ($(this).text().includes('(mute)')) {
+            audio.muted = true;
+            $(this).text('(unmute)');
+        } else {
+            audio.muted = false;
+            $(this).text('(mute)');
+        }
+    });
+
     $(document).on('click', '.words', function (event) {
         if (i > ps.length) return;
-
-        if (i === 0) {
-            $("<div>").attr("id", `constellation${constellationCount}`).appendTo("#constellation");
-        }
 
         $("#poem").append($(this).html() + '<br>');
         i++;
@@ -208,7 +213,7 @@ $(document).ready(function () {
             left: x + "px",
             top: y + "px"
         });
-        $(`#constellation${constellationCount}`).append(star);
+        $("#constellation").append(star);
 
         // drawing lines between them
         if (prevStarCoords !== null) {
@@ -222,7 +227,7 @@ $(document).ready(function () {
                 transform: "rotate(" + angle + "rad)"
             });
 
-            $(`#constellation${constellationCount}`).append(lineElement);
+            $("#constellation").append(lineElement);
         };
         prevStarCoords = [x, y];
 
@@ -233,7 +238,6 @@ $(document).ready(function () {
 
         if (i === ps.length) {
             main = false;
-            constellationCount++;
             $("#mirrored-cursor").css("visibility", "hidden");
             $("#metadata").css("visibility", "visible").hide().fadeIn(fadeSpeed);
             return;
@@ -242,6 +246,7 @@ $(document).ready(function () {
         putWords();
     });
 
+    // Handles screen capture after a constellation is made
     $('#capture').click(function () {
         const options = {
             allowTaint: true,
@@ -258,11 +263,12 @@ $(document).ready(function () {
         });
     });
 
+    // Shows the about text for the authors
     $("#about").click(function (event) {
         event.stopPropagation();
         let t = $(this).text() === "( )" ?
-            "( Making Constellations is a collaboration between Miaoye Que and Mouthwash Research Center. May 2024. )" : "( )";
-        $(this).text(t);
+            "( Making Constellations is a collaboration between <a href='https://sproutleaf.github.io/' target='_blank'>Miaoye Que</a> and <a href='https://research.mouthwash.studio/' target='_blank'>Mouthwash Research Center</a>. May 2024. )" : "( )";
+        $(this).html(t);
     })
 
     $("#reset").on("click", function () {
