@@ -1,14 +1,4 @@
 @font-face {
-    font-family: 'rag';
-    src: url('assets/Rag-Regular.woff2');
-}
-
-@font-face {
-    font-family: 'ia-writer-quattro';
-    src: url('assets/iAWriterQuattro/iAWriterQuattroS-Regular.woff2');
-}
-
-@font-face {
     font-family: 'diatype';
     src: url('assets/diatype.otf') format('opentype');
 }
@@ -119,6 +109,7 @@ a {
     pointer-events: all;
     visibility: visible;
     left: 10vw;
+    right: 10vw;
 }
 
 #reset {
@@ -154,4 +145,36 @@ a {
 
 #detailed-info {
     display: none;
+}
+
+/* Overriding CSS attributes for tablets */
+@media (max-width: 1024px) {
+    #capture {
+        display: none;
+    }
+
+    #intro {
+        top: 5vh;
+        max-width: 60vw;
+    }
+
+    #reset {
+        top: 5vh;
+    }
+
+    #info {
+        bottom: 5vh;
+    }
+}
+
+/* Overriding CSS attributes for mobile phones */
+@media (max-width: 767px) {
+    #intro {
+        top: 20vh;
+        max-width: 80vw;
+    }
+
+    #poem {
+        top: -5vh;
+    }
 }

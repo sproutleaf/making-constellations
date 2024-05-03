@@ -195,11 +195,17 @@ $(document).ready(function () {
         }
     });
 
+    // Handles transitioning between words
     $(document).on('click', '.words', function (event) {
         if (i > ps.length) return;
 
-        $("#poem").append($(this).html() + '<br>');
-        i++;
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            $("#poem").append($(this).html() + ' ');
+            i++;
+        } else {
+            $("#poem").append($(this).html() + '<br>');
+            i++;
+        }
         $("#poem").append((i % 3 === 0) ? '<br>' : '');
 
         // Placing stars
@@ -271,6 +277,7 @@ $(document).ready(function () {
         $(this).html(t);
     })
 
+    // Resets after a constellation has been formed
     $("#reset").on("click", function () {
         main = true;
         startWeaving();
